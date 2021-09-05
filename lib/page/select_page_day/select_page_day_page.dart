@@ -3,8 +3,15 @@ import 'package:ens/page/select_page_day/select_page_day_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+enum PageDaySelectType { page, day }
+
 class SelectPageOrDayPage extends StatefulWidget {
-  const SelectPageOrDayPage({Key? key}) : super(key: key);
+  final void Function(PageDaySelectType selectType, List<int> select)? confirmCallback;
+
+  const SelectPageOrDayPage({
+    Key? key,
+    this.confirmCallback,
+  }) : super(key: key);
 
   @override
   _SelectPageOrDayPageState createState() => _SelectPageOrDayPageState();
@@ -55,15 +62,16 @@ class _SelectPageOrDayPageState extends State<SelectPageOrDayPage> {
             ),
             Wrap(
               children: viewModel.pages
-                  .map((e) => GestureDetector(
-                        onTap: () {
-                          viewModel.selectPage(e);
-                        },
-                        child: SelectPageItemWidget(
-                          string: e.toString(),
-                          highlight: viewModel.selectedPages.contains(e),
-                        ),
-                      ))
+                  .map((e) =>
+                  GestureDetector(
+                    onTap: () {
+                      viewModel.selectPage(e);
+                    },
+                    child: SelectPageItemWidget(
+                      string: e.toString(),
+                      highlight: viewModel.selectedPages.contains(e),
+                    ),
+                  ))
                   .toList(),
             ),
           ],
@@ -85,15 +93,16 @@ class _SelectPageOrDayPageState extends State<SelectPageOrDayPage> {
             ),
             Wrap(
               children: viewModel.days
-                  .map((e) => GestureDetector(
-                        onTap: () {
-                          viewModel.selectDay(e);
-                        },
-                        child: SelectPageItemWidget(
-                          string: e.toString(),
-                          highlight: viewModel.selectedDays.contains(e),
-                        ),
-                      ))
+                  .map((e) =>
+                  GestureDetector(
+                    onTap: () {
+                      viewModel.selectDay(e);
+                    },
+                    child: SelectPageItemWidget(
+                      string: e.toString(),
+                      highlight: viewModel.selectedDays.contains(e),
+                    ),
+                  ))
                   .toList(),
             ),
           ],
@@ -107,19 +116,27 @@ class _SelectPageOrDayPageState extends State<SelectPageOrDayPage> {
       child: Consumer<SelectPageOrDayViewModel>(
         builder: (ctx, vm, _) {
           bool highlight = vm.selectedDays.isNotEmpty || vm.selectedPages.isNotEmpty;
-          return Container(
-            alignment: Alignment.center,
-            height: 44,
-            width: double.infinity,
-            margin: EdgeInsets.only(bottom: 20),
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            decoration:
-                BoxDecoration(color: highlight ? Colors.pink : Colors.grey, borderRadius: BorderRadius.circular(22)),
-            child: Text(
-              '选择',
-              style: TextStyle(
-                color: highlight ? Colors.white : Colors.black,
-                fontSize: 20,
+          return GestureDetector(
+            onTap: highlight ? () {
+              PageDaySelectType selectType = vm.selectedDays.isNotEmpty ? PageDaySelectType.day : PageDaySelectType
+                  .page;
+              List<int> select = vm.selectedDays.isNotEmpty ? vm.selectedDays : vm.selectedPages;
+              widget.confirmCallback?.call(selectType, select);
+            } : null,
+            child: Container(
+              alignment: Alignment.center,
+              height: 44,
+              width: double.infinity,
+              margin: EdgeInsets.only(bottom: 20),
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              decoration:
+              BoxDecoration(color: highlight ? Colors.pink : Colors.grey, borderRadius: BorderRadius.circular(22)),
+              child: Text(
+                '选择',
+                style: TextStyle(
+                  color: highlight ? Colors.white : Colors.black,
+                  fontSize: 20,
+                ),
               ),
             ),
           );

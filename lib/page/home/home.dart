@@ -1,5 +1,7 @@
 import 'package:ens/page/select_page_day/select_page_day_page.dart';
+import 'package:ens/page/study_page/study_page.dart';
 import 'package:ens/page/word_list/word_list_page.dart';
+import 'package:ens/word_manager/word.dart';
 import 'package:ens/word_manager/word_manager.dart';
 import 'package:flutter/material.dart';
 
@@ -44,7 +46,21 @@ class _HomePageState extends State<HomePage> {
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) {
-                    return SelectPageOrDayPage();
+                    return SelectPageOrDayPage(confirmCallback: (type, select) {
+                      List<Word> words = [];
+                      if (type == PageDaySelectType.page) {
+                        select.forEach((element) {
+                          words.addAll(WordManager.shared.pageWords[element]?.toList() ?? []);
+                        });
+                      } else {
+                        select.forEach((element) {
+                          words.addAll(WordManager.shared.dayWords[element]?.toList() ?? []);
+                        });
+                        Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                          return StudyPage(words: words);
+                        }));
+                      }
+                    });
                   },
                 ));
               },

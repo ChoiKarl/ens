@@ -32,6 +32,9 @@ dependencies:
   provider:
   shared_preferences:
   tuple:
+  dio:
+  device_info:
+  crypto:
 
 dev_dependencies:
   flutter_test:

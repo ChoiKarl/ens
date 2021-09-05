@@ -112,9 +112,11 @@ class WordCell extends StatelessWidget {
             style: TextStyle(fontSize: 14, color: Colors.white),
           ),
         ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: matchs.map((e) => Text(e)).toList(),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: matchs.map((e) => Text(e)).toList(),
+          ),
         ),
       ],
     );
