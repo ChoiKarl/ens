@@ -33,7 +33,7 @@ class _StudyPageState extends State<StudyPage> {
         return Scaffold(
           appBar: AppBar(
             title: Selector<StudyPageViewModel, int>(
-              selector: (ctx, vm) => vm.alreadyStudyWords.length,
+              selector: (ctx, vm) => vm.alreadyStudyCount,
               builder: (context, value, child) {
                 return Text('$value/${viewModel.needStudyWords.length}');
               },
@@ -48,23 +48,31 @@ class _StudyPageState extends State<StudyPage> {
                     left: 20,
                     right: 20,
                     bottom: 100,
-                    child: StudyCard(word: viewModel.needStudyWords[viewModel.alreadyStudyWords.length]),
+                    child: StudyCard(),
                   ),
                   Positioned(
-                      left: 10,
-                      right: 10,
-                      bottom: 10,
-                      child: Container(
-                        height: 44,
-                        decoration: BoxDecoration(color: Colors.pink, borderRadius: BorderRadius.circular(22)),
-                        child: TextButton(
-                          onPressed: () {},
-                          child: Text(
-                            '点击',
-                            style: TextStyle(color: Colors.white, fontSize: 20),
-                          ),
+                    left: 10,
+                    right: 10,
+                    bottom: 10,
+                    child: Container(
+                      height: 44,
+                      decoration: BoxDecoration(color: Colors.pink, borderRadius: BorderRadius.circular(22)),
+                      child: TextButton(
+                        onPressed: () {
+                          viewModel.repeatStudy();
+                        },
+                        child: Selector<StudyPageViewModel, int>(
+                          selector: (_, vm) => vm.studyingWordRepeatCount,
+                          builder: (context, value, child) {
+                            return Text(
+                              value == SINGLE_WORD_STUDY_MAX_COUNT ? '下一个' : '重复',
+                              style: TextStyle(color: Colors.white, fontSize: 20),
+                            );
+                          },
                         ),
-                      ))
+                      ),
+                    ),
+                  )
                 ],
               ),
             ),
@@ -76,12 +84,6 @@ class _StudyPageState extends State<StudyPage> {
 }
 
 class StudyCard extends StatelessWidget {
-  final Word word;
-
-  const StudyCard({
-    Key? key,
-    required this.word,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -103,36 +105,41 @@ class StudyCard extends StatelessWidget {
           Positioned(
             top: 5,
             right: 5,
-            child: Text('1/5'),
+            child: Selector<StudyPageViewModel, int>(
+              selector: (_, vm) => vm.studyingWordRepeatCount,
+              builder: (context, value, child) {
+                return Text('$value/$SINGLE_WORD_STUDY_MAX_COUNT');
+              },
+            ),
           ),
           Positioned(
             left: 0,
             right: 0,
             top: 40,
-            child: Column(
-              children: [
-                GestureDetector(
-                  onTap:() {
-                    Network.shared.queryWord(word.word);
-                  },
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      word.word,
-                      maxLines: 1,
-                      style: TextStyle(fontSize: 60, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
+            child: Selector<StudyPageViewModel, Word>(
+              selector: (_, vm) => vm.currentShowWord,
+              builder: (context, word, child) {
+                return Column(
+                  children: [
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        word.word,
+                        maxLines: 1,
+                        style: TextStyle(fontSize: 60, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                Text(
-                  word.explain,
-                  maxLines: 1,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                )
-              ],
+                    SizedBox(height: 20),
+                    Text(
+                      word.explain,
+                      maxLines: 1,
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    )
+                  ],
+                );
+              },
             ),
           )
         ],

@@ -56,10 +56,10 @@ class _HomePageState extends State<HomePage> {
                         select.forEach((element) {
                           words.addAll(WordManager.shared.dayWords[element]?.toList() ?? []);
                         });
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                          return StudyPage(words: words);
-                        }));
                       }
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                        return StudyPage(words: words);
+                      }));
                     });
                   },
                 ));
