@@ -12,8 +12,8 @@ void tryCatch(Function? f) {
 
 class FFConvert {
   FFConvert._();
-  static T? Function<T extends Object?>(dynamic value) convert =
-  <T>(dynamic value) {
+
+  static T? Function<T extends Object?>(dynamic value) convert = <T>(dynamic value) {
     if (value == null) {
       return null;
     }
@@ -63,14 +63,14 @@ class Word {
   });
 
   factory Word.fromJson(Map<String, dynamic> jsonRes) => Word(
-    word: asT<String>(jsonRes['word'])!,
-    explain: asT<String>(jsonRes['explain'])!,
-    match: asT<String>(jsonRes['match'])!,
-    example: asT<String>(jsonRes['example'])!,
-    exampleTranslation: asT<String>(jsonRes['exampleTranslation'])!,
-    page: asT<int>(jsonRes['page'])!,
-    day: asT<int>(jsonRes['day'])!,
-  );
+        word: asT<String>(jsonRes['word'])!,
+        explain: asT<String>(jsonRes['explain'])!,
+        match: asT<String>(jsonRes['match'])!,
+        example: asT<String>(jsonRes['example'])!,
+        exampleTranslation: asT<String>(jsonRes['exampleTranslation'])!,
+        page: asT<int>(jsonRes['page'])!,
+        day: asT<int>(jsonRes['day'])!,
+      );
 
   String word;
   String explain;
@@ -86,12 +86,19 @@ class Word {
   }
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-    'word': word,
-    'explain': explain,
-    'match': match,
-    'example': example,
-    'exampleTranslation': exampleTranslation,
-    'page': page,
-    'day': day,
-  };
+        'word': word,
+        'explain': explain,
+        'match': match,
+        'example': example,
+        'exampleTranslation': exampleTranslation,
+        'page': page,
+        'day': day,
+      };
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is Word && runtimeType == other.runtimeType && word == other.word;
+
+  @override
+  int get hashCode => word.hashCode;
 }

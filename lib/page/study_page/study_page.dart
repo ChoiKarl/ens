@@ -3,6 +3,7 @@ import 'package:ens/page/study_page/study_page_view_model.dart';
 import 'package:ens/word_manager/word.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tuple/tuple.dart';
 
 class StudyPage extends StatefulWidget {
   final List<Word> words;
@@ -32,10 +33,12 @@ class _StudyPageState extends State<StudyPage> {
       builder: (context, child) {
         return Scaffold(
           appBar: AppBar(
-            title: Selector<StudyPageViewModel, int>(
-              selector: (ctx, vm) => vm.alreadyStudyCount,
+            title: Selector<StudyPageViewModel, Word>(
+              selector: (ctx, vm) => vm.currentShowWord,
               builder: (context, value, child) {
-                return Text('$value/${viewModel.needStudyWords.length}');
+                int count = viewModel.alreadyStudyCount;
+                count = viewModel.revising ? count : count + 1;
+                return Text('$count/${viewModel.needStudyWords.length}');
               },
             ),
           ),
@@ -84,9 +87,9 @@ class _StudyPageState extends State<StudyPage> {
 }
 
 class StudyCard extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
+    var viewModel = Provider.of<StudyPageViewModel>(context, listen: false);
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -113,31 +116,50 @@ class StudyCard extends StatelessWidget {
             ),
           ),
           Positioned(
+            top: 5,
+            left: 5,
+            child: Selector<StudyPageViewModel, int>(
+              selector: (_, vm) => vm.alreadyReviseWordsCount,
+              builder: (context, value, child) {
+                return Offstage(
+                  offstage: value == 0,
+                  child: Text('$value/${viewModel.totalReviseWordsCount}', style: TextStyle(color: Colors.green)),
+                );
+              },
+            ),
+          ),
+          Positioned(
             left: 0,
             right: 0,
             top: 40,
             child: Selector<StudyPageViewModel, Word>(
               selector: (_, vm) => vm.currentShowWord,
               builder: (context, word, child) {
-                return Column(
-                  children: [
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        word.word,
-                        maxLines: 1,
-                        style: TextStyle(fontSize: 60, fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
+                return DefaultTextStyle(
+                  style: TextStyle(
+                    color:
+                    viewModel.revising ? Colors.green : Colors.black,
+                  ),
+                  child: Column(
+                    children: [
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          word.word,
+                          maxLines: 1,
+                          style: TextStyle(fontSize: 60, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      word.explain,
-                      maxLines: 1,
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
-                    )
-                  ],
+                      SizedBox(height: 20),
+                      Text(
+                        word.explain,
+                        maxLines: 1,
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      )
+                    ],
+                  ),
                 );
               },
             ),

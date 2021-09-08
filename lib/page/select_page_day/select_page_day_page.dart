@@ -61,6 +61,8 @@ class _SelectPageOrDayPageState extends State<SelectPageOrDayPage> {
               style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
             ),
             Wrap(
+              spacing: 10,
+              runSpacing: 10,
               children: viewModel.pages
                   .map((e) =>
                   GestureDetector(
@@ -92,6 +94,7 @@ class _SelectPageOrDayPageState extends State<SelectPageOrDayPage> {
               style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
             ),
             Wrap(
+              spacing: 10,
               children: viewModel.days
                   .map((e) =>
                   GestureDetector(
