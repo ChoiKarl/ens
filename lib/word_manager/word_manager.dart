@@ -5,6 +5,9 @@ import 'dart:io' as io;
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
+const String WORD_TABLE = 'word';
+const String COLLECT_WORD_TABLE = 'collect_word';
+
 class WordManager {
   static WordManager? _instance;
 
@@ -18,6 +21,7 @@ class WordManager {
 
   Map<int, List<Word>> dayWords = {};
   Map<int, List<Word>> pageWords = {};
+  List<Word> collectWords = [];
 
   Future<void> fetchWords() async {
     if (words.isNotEmpty) return;
@@ -26,7 +30,7 @@ class WordManager {
       _db = await openDatabase(path);
     }
 
-    List<Map<String, dynamic>> result = await _db!.rawQuery('select * from word');
+    List<Map<String, dynamic>> result = await _db!.rawQuery('select * from $WORD_TABLE');
 
     Set<int> days = Set();
     Set<int> pages = Set();
@@ -45,7 +49,25 @@ class WordManager {
       pageWords[page] = words.where((word) => word.page == page).toList();
     });
 
+    result = await _db!.rawQuery('select * from $COLLECT_WORD_TABLE');
+    result.forEach((element1) {
+      Word word = words.firstWhere((element2) => element2.word == element1['word']);
+      collectWords.add(word);
+    });
+
     return;
+  }
+
+  Future<bool> collectionWord(Word word) async {
+    var query = await _db!.query(COLLECT_WORD_TABLE, where: 'word = ?', whereArgs: [word.word]);
+    if (query.isNotEmpty) {
+      int delete = await _db!.delete(COLLECT_WORD_TABLE, where: 'word = ?', whereArgs: [word.word]);
+      collectWords.removeWhere((element) => element.word == word.word);
+      return delete != 0;
+    }
+    var insert = await _db!.insert(COLLECT_WORD_TABLE, {'word': word.word});
+    collectWords.add(word);
+    return insert != 0;
   }
 }
 

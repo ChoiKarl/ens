@@ -46,6 +46,9 @@ class _HomePageState extends State<HomePage> {
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) {
+                    if (studyViewModel != null) {
+                      return StudyPage(words: []);
+                    }
                     return SelectPageOrDayPage(confirmCallback: (type, select) {
                       List<Word> words = [];
                       if (type == PageDaySelectType.page) {

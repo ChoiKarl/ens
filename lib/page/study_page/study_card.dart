@@ -1,9 +1,15 @@
 import 'package:ens/page/study_page/study_page_view_model.dart';
 import 'package:ens/word_manager/word.dart';
+import 'package:ens/word_manager/word_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class StudyCard extends StatelessWidget {
+class StudyCard extends StatefulWidget {
+  @override
+  _StudyCardState createState() => _StudyCardState();
+}
+
+class _StudyCardState extends State<StudyCard> {
   @override
   Widget build(BuildContext context) {
     var viewModel = Provider.of<StudyPageViewModel>(context, listen: false);
@@ -54,8 +60,7 @@ class StudyCard extends StatelessWidget {
               builder: (context, word, child) {
                 return DefaultTextStyle(
                   style: TextStyle(
-                    color:
-                    viewModel.revising ? Colors.green : Colors.black,
+                    color: viewModel.revising ? Colors.green : Colors.black,
                   ),
                   child: Column(
                     children: [
@@ -89,6 +94,25 @@ class StudyCard extends StatelessWidget {
                   ),
                 );
               },
+            ),
+          ),
+          Positioned(
+            left: 10,
+            bottom: 10,
+            child: GestureDetector(
+              onTap: () {
+                WordManager.shared.collectionWord(viewModel.currentShowWord).then((value) {
+                  setState(() {});
+                });
+              },
+              child: Selector<StudyPageViewModel, Word>(
+                selector: (_, vm) => vm.currentShowWord,
+                builder: (context, value, child) {
+                  return WordManager.shared.collectWords.contains(value)
+                      ? Icon(Icons.star, color: Colors.pink)
+                      : Icon(Icons.star_border_outlined);
+                },
+              ),
             ),
           )
         ],
