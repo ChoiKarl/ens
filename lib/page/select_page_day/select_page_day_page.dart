@@ -3,11 +3,12 @@ import 'package:ens/page/select_page_day/select_page_day_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-enum PageDaySelectType { page, day }
-
+enum PageDaySelectType {
+  page,
+  day,
+}
 class SelectPageOrDayPage extends StatefulWidget {
   final void Function(PageDaySelectType selectType, List<int> select)? confirmCallback;
-
   const SelectPageOrDayPage({
     Key? key,
     this.confirmCallback,
@@ -64,16 +65,15 @@ class _SelectPageOrDayPageState extends State<SelectPageOrDayPage> {
               spacing: 10,
               runSpacing: 10,
               children: viewModel.pages
-                  .map((e) =>
-                  GestureDetector(
-                    onTap: () {
-                      viewModel.selectPage(e);
-                    },
-                    child: SelectPageItemWidget(
-                      string: e.toString(),
-                      highlight: viewModel.selectedPages.contains(e),
-                    ),
-                  ))
+                  .map((e) => GestureDetector(
+                        onTap: () {
+                          viewModel.selectPage(e);
+                        },
+                        child: SelectPageItemWidget(
+                          string: e.toString(),
+                          highlight: viewModel.selectedPages.contains(e),
+                        ),
+                      ))
                   .toList(),
             ),
           ],
@@ -96,16 +96,15 @@ class _SelectPageOrDayPageState extends State<SelectPageOrDayPage> {
             Wrap(
               spacing: 10,
               children: viewModel.days
-                  .map((e) =>
-                  GestureDetector(
-                    onTap: () {
-                      viewModel.selectDay(e);
-                    },
-                    child: SelectPageItemWidget(
-                      string: e.toString(),
-                      highlight: viewModel.selectedDays.contains(e),
-                    ),
-                  ))
+                  .map((e) => GestureDetector(
+                        onTap: () {
+                          viewModel.selectDay(e);
+                        },
+                        child: SelectPageItemWidget(
+                          string: e.toString(),
+                          highlight: viewModel.selectedDays.contains(e),
+                        ),
+                      ))
                   .toList(),
             ),
           ],
@@ -120,12 +119,14 @@ class _SelectPageOrDayPageState extends State<SelectPageOrDayPage> {
         builder: (ctx, vm, _) {
           bool highlight = vm.selectedDays.isNotEmpty || vm.selectedPages.isNotEmpty;
           return GestureDetector(
-            onTap: highlight ? () {
-              PageDaySelectType selectType = vm.selectedDays.isNotEmpty ? PageDaySelectType.day : PageDaySelectType
-                  .page;
-              List<int> select = vm.selectedDays.isNotEmpty ? vm.selectedDays : vm.selectedPages;
-              widget.confirmCallback?.call(selectType, select);
-            } : null,
+            onTap: highlight
+                ? () {
+                    PageDaySelectType selectType =
+                        vm.selectedDays.isNotEmpty ? PageDaySelectType.day : PageDaySelectType.page;
+                    List<int> select = vm.selectedDays.isNotEmpty ? vm.selectedDays : vm.selectedPages;
+                    widget.confirmCallback?.call(selectType, select);
+                  }
+                : null,
             child: Container(
               alignment: Alignment.center,
               height: 44,
@@ -133,7 +134,7 @@ class _SelectPageOrDayPageState extends State<SelectPageOrDayPage> {
               margin: EdgeInsets.only(bottom: 20),
               padding: EdgeInsets.symmetric(horizontal: 20),
               decoration:
-              BoxDecoration(color: highlight ? Colors.pink : Colors.grey, borderRadius: BorderRadius.circular(22)),
+                  BoxDecoration(color: highlight ? Colors.pink : Colors.grey, borderRadius: BorderRadius.circular(22)),
               child: Text(
                 '选择',
                 style: TextStyle(

@@ -1,15 +1,17 @@
 import 'dart:math';
 
+import 'package:ens/page/study_page/study_page.dart';
 import 'package:ens/word_manager/word.dart';
 import 'package:flutter/cupertino.dart';
 
 const int SINGLE_WORD_STUDY_MAX_COUNT = 5;
 
 class StudyPageViewModel extends ChangeNotifier {
-  StudyPageViewModel(this.needStudyWords) {
+  StudyPageViewModel({required this.pageStyle, required this.needStudyWords}) {
     _currentShowWord = needStudyWords.first;
   }
 
+  final PageStyle pageStyle;
   final List<Word> needStudyWords;
   final Random random = Random();
 
@@ -37,7 +39,12 @@ class StudyPageViewModel extends ChangeNotifier {
   /// 已经复习的单词的数量
   int get alreadyReviseWordsCount => _alreadyReviseWords.length;
   /// 总共需要复习的数量
-  int get totalReviseWordsCount => alreadyStudyCount - 1/*已学习最后一个不在复习范围内*/;
+  int get totalReviseWordsCount {
+    // 全部学完,最后一个也复习
+    if (needStudyWords.length == alreadyStudyCount) return alreadyStudyCount;
+    // 已学习的最后一个不在复习范围内
+    return alreadyStudyCount - 1;
+  }
   /// 是否在复习
   bool _revising = false;
   bool get revising => _revising;
@@ -60,22 +67,29 @@ class StudyPageViewModel extends ChangeNotifier {
       if (!_alreadyStudyWords.contains(currentShowWord)) {
         _alreadyStudyWords.add(currentShowWord);
       }
-      switchNextWord();
+      _switchNextWord();
     }
     notifyListeners();
   }
 
   /// 切换下一个要学习的词汇
-  void switchNextWord() {
+  void _switchNextWord() {
+    // 学完了,也复习完了,就不再继续.
+    if (alreadyStudyCount == needStudyWords.length && revising && _reviseWords.length == 0) return;
+
     if (_reviseWords.isEmpty && alreadyStudyCount > 1 && revising == false) {
       _reviseWords = _alreadyStudyWords.toList();
-      _reviseWords.removeLast();
+      // 最后一个是刚学的,不需要复习,如果是全部学完了,就将最后一个保留复习一次.
+      if (alreadyStudyCount != needStudyWords.length) {
+        _reviseWords.removeLast();
+      }
     }
 
-    if (_reviseWords.isEmpty) {
+    // 只有背诵模式才需要反复
+    if (_reviseWords.isEmpty || pageStyle != PageStyle.recite) {
       _revising = false;
-      _currentShowWord = needStudyWords[alreadyStudyCount];
       _alreadyReviseWords.clear();
+      _currentShowWord = needStudyWords[alreadyStudyCount];
     } else {
       _revising = true;
       // 复习之前的

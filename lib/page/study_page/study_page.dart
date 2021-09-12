@@ -5,14 +5,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-StudyPageViewModel? studyViewModel;
+Map<PageStyle, StudyPageViewModel> pageViewModels = {};
+
+enum PageStyle {
+  recite, // 背诵
+  review, // 复习,
+  collect, // 收藏
+}
 
 class StudyPage extends StatefulWidget {
   final List<Word> words;
+  final PageStyle pageStyle;
 
   const StudyPage({
     Key? key,
     required this.words,
+    required this.pageStyle,
   }) : super(key: key);
 
   @override
@@ -24,7 +32,12 @@ class _StudyPageState extends State<StudyPage> {
 
   @override
   void initState() {
-    viewModel = studyViewModel != null ? studyViewModel! : StudyPageViewModel(widget.words);
+    viewModel = pageViewModels[widget.pageStyle] != null
+        ? pageViewModels[widget.pageStyle]!
+        : StudyPageViewModel(
+            pageStyle: widget.pageStyle,
+            needStudyWords: widget.words,
+          );
     super.initState();
   }
 
@@ -36,18 +49,17 @@ class _StudyPageState extends State<StudyPage> {
             context: context,
             builder: (context) {
               return CupertinoAlertDialog(
-
                 title: Text('保存学习记录?'),
                 actions: [
                   CupertinoDialogAction(
                       onPressed: () {
-                        studyViewModel = null;
+                        pageViewModels.remove(widget.pageStyle);
                         Navigator.of(context).pop(true);
                       },
                       child: Text('取消')),
                   CupertinoDialogAction(
                     onPressed: () {
-                      studyViewModel = viewModel;
+                      pageViewModels[widget.pageStyle] = viewModel;
                       Navigator.of(context).pop(true);
                     },
                     child: Text(
