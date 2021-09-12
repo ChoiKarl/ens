@@ -36,6 +36,7 @@ dependencies:
   device_info:
   crypto:
   path_provider:
+  audioplayers:
 
 dev_dependencies:
   flutter_test:

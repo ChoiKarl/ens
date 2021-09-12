@@ -1,8 +1,13 @@
+import 'package:audioplayers/audioplayers.dart';
+import 'package:ens/network/network.dart';
 import 'package:ens/page/study_page/study_page_view_model.dart';
 import 'package:ens/word_manager/word.dart';
 import 'package:ens/word_manager/word_manager.dart';
+import 'package:ens/yd/yd_translate.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+AudioPlayer _audioPlayer = AudioPlayer();
 
 class StudyCard extends StatefulWidget {
   @override
@@ -55,6 +60,7 @@ class _StudyCardState extends State<StudyCard> {
             left: 0,
             right: 0,
             top: 40,
+            bottom: 20,
             child: Selector<StudyPageViewModel, Word>(
               selector: (_, vm) => vm.currentShowWord,
               builder: (context, word, child) {
@@ -73,7 +79,33 @@ class _StudyCardState extends State<StudyCard> {
                           textAlign: TextAlign.center,
                         ),
                       ),
-                      SizedBox(height: 20),
+                      FutureBuilder<YDTranslateResult>(
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return GestureDetector(
+                              onTap: () {
+                                if (snapshot.data?.basic?.ukSpeech != null) {
+                                  _audioPlayer.play(snapshot.data!.basic!.ukSpeech!);
+                                }
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    snapshot.data?.basic?.ukPhonetic ?? '',
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                  ),
+                                  SizedBox(width: 5),
+                                  Icon(Icons.record_voice_over_sharp)
+                                ],
+                              ),
+                            );
+                          }
+                          return Container();
+                        },
+                        future: WordManager.shared.getTranslate(viewModel.currentShowWord.word),
+                      ),
+                      Expanded(child: SizedBox()),
                       Text(
                         word.explain,
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),

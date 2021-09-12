@@ -1,4 +1,7 @@
+import 'package:dio/dio.dart';
+import 'package:ens/network/network.dart';
 import 'package:ens/word_manager/word.dart';
+import 'package:ens/yd/yd_translate.dart';
 import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:io' as io;
@@ -22,6 +25,8 @@ class WordManager {
   Map<int, List<Word>> dayWords = {};
   Map<int, List<Word>> pageWords = {};
   List<Word> collectWords = [];
+
+  Map<String, YDTranslateResult> translates = {};
 
   Future<void> fetchWords() async {
     if (words.isNotEmpty) return;
@@ -69,6 +74,14 @@ class WordManager {
     collectWords.add(word);
     return insert != 0;
   }
+
+  Future<YDTranslateResult> getTranslate(String word) async {
+    if (translates[word] != null) return translates[word]!;
+    Response response = await Network.shared.queryWord(word);
+    var result = YDTranslateResult.fromJson(response.data);
+    translates[word] = result;
+    return result;
+  }
 }
 
 Future<String> loadLocalDB() async {
@@ -78,7 +91,7 @@ Future<String> loadLocalDB() async {
 
   bool dbExistsEnglish = await io.File(dbPathEnglish).exists();
 
-  if (!dbExistsEnglish) {
+  if (true) {
     ByteData data = await rootBundle.load(path.join("assets", "english.db"));
     List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
     await io.File(dbPathEnglish).writeAsBytes(bytes, flush: true);
