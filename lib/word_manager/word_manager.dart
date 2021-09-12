@@ -91,7 +91,7 @@ Future<String> loadLocalDB() async {
 
   bool dbExistsEnglish = await io.File(dbPathEnglish).exists();
 
-  if (true) {
+  if (!dbExistsEnglish) {
     ByteData data = await rootBundle.load(path.join("assets", "english.db"));
     List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
     await io.File(dbPathEnglish).writeAsBytes(bytes, flush: true);

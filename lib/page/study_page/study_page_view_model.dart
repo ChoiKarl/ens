@@ -40,7 +40,6 @@ class StudyPageViewModel extends ChangeNotifier {
   int get totalReviseWordsCount => alreadyStudyCount - 1/*已学习最后一个不在复习范围内*/;
   /// 是否在复习
   bool _revising = false;
-
   bool get revising => _revising;
 
   /// 学习
@@ -77,5 +76,14 @@ class StudyPageViewModel extends ChangeNotifier {
       _alreadyReviseWords.add(word);
       _currentShowWord = word;
     }
+    _showChinese = revising == false;
+  }
+
+  bool _showChinese = false;
+  bool get showChinese => _showChinese;
+  set showChinese(bool value) {
+    if (_showChinese == value) return;
+    _showChinese = value;
+    notifyListeners();
   }
 }

@@ -36,6 +36,7 @@ class _StudyPageState extends State<StudyPage> {
             context: context,
             builder: (context) {
               return CupertinoAlertDialog(
+
                 title: Text('保存学习记录?'),
                 actions: [
                   CupertinoDialogAction(
@@ -59,7 +60,7 @@ class _StudyPageState extends State<StudyPage> {
                 ],
               );
             });
-        return value!;
+        return value ?? false;
       },
       child: ChangeNotifierProvider<StudyPageViewModel>.value(
         value: viewModel,

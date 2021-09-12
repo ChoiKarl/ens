@@ -1,5 +1,4 @@
 import 'package:audioplayers/audioplayers.dart';
-import 'package:ens/network/network.dart';
 import 'package:ens/page/study_page/study_page_view_model.dart';
 import 'package:ens/word_manager/word.dart';
 import 'package:ens/word_manager/word_manager.dart';
@@ -72,11 +71,16 @@ class _StudyCardState extends State<StudyCard> {
                     children: [
                       FittedBox(
                         fit: BoxFit.scaleDown,
-                        child: Text(
-                          word.word,
-                          maxLines: 1,
-                          style: TextStyle(fontSize: 60, fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
+                        child: GestureDetector(
+                          onDoubleTap: () {
+                            viewModel.showChinese = true;
+                          },
+                          child: Text(
+                            word.word,
+                            maxLines: 1,
+                            style: TextStyle(fontSize: 60, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ),
                       FutureBuilder<YDTranslateResult>(
@@ -106,21 +110,48 @@ class _StudyCardState extends State<StudyCard> {
                         future: WordManager.shared.getTranslate(viewModel.currentShowWord.word),
                       ),
                       Expanded(child: SizedBox()),
-                      Text(
-                        word.explain,
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
+                      Selector<StudyPageViewModel, bool>(
+                        selector: (_, vm) => vm.showChinese,
+                        builder: (context, value, child) => Visibility(
+                          visible: value,
+                          child: Text(
+                            word.explain,
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Selector<StudyPageViewModel, bool>(
+                        selector: (_, vm) => vm.showChinese,
+                        builder: (context, value, child) => Visibility(
+                          visible: value,
+                            child: Column(
+                          children: viewModel.currentShowWord.match.split("|").map((e) {
+                            if (e.isEmpty) return Container();
+                            return Text(
+                              e,
+                              style: TextStyle(fontSize: 15),
+                            );
+                          }).toList(),
+                        )),
                       ),
                       SizedBox(height: 20),
-                      Text(
+                      SelectableText(
                         word.example,
                         style: TextStyle(fontSize: 20),
                         textAlign: TextAlign.center,
                       ),
-                      Text(
-                        word.exampleTranslation,
-                        style: TextStyle(fontSize: 20),
-                        textAlign: TextAlign.center,
+                      Selector<StudyPageViewModel, bool>(
+                        selector: (_, vm) => vm.showChinese,
+                        builder: (context, value, child) => Visibility(
+                          visible: value,
+                          child: Text(
+                            word.exampleTranslation,
+                            style: TextStyle(fontSize: 20),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
                       ),
                     ],
                   ),
