@@ -42,6 +42,14 @@ class StudyPageViewModel extends ChangeNotifier {
   bool _revising = false;
   bool get revising => _revising;
 
+  /// 是否显示中文
+  bool _showChinese = true;
+  bool get showChinese => _showChinese;
+  set showChinese(bool value) {
+    if (_showChinese == value) return;
+    _showChinese = value;
+    notifyListeners();
+  }
   /// 学习
   void repeatStudy() {
     _studyingWordRepeatCount += 1;
@@ -77,13 +85,5 @@ class StudyPageViewModel extends ChangeNotifier {
       _currentShowWord = word;
     }
     _showChinese = revising == false;
-  }
-
-  bool _showChinese = false;
-  bool get showChinese => _showChinese;
-  set showChinese(bool value) {
-    if (_showChinese == value) return;
-    _showChinese = value;
-    notifyListeners();
   }
 }
