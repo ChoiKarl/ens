@@ -37,6 +37,8 @@ dependencies:
   crypto:
   path_provider:
   audioplayers:
+  webview_flutter:
+  fluttertoast:
 
 dev_dependencies:
   flutter_test:

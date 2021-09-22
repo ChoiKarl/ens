@@ -38,6 +38,7 @@ class StudyPageViewModel extends ChangeNotifier {
 
   /// 已经复习的单词的数量
   int get alreadyReviseWordsCount => _alreadyReviseWords.length;
+
   /// 总共需要复习的数量
   int get totalReviseWordsCount {
     // 全部学完,最后一个也复习
@@ -45,18 +46,31 @@ class StudyPageViewModel extends ChangeNotifier {
     // 已学习的最后一个不在复习范围内
     return alreadyStudyCount - 1;
   }
+
   /// 是否在复习
   bool _revising = false;
+
   bool get revising => _revising;
 
   /// 是否显示中文
   bool _showChinese = true;
-  bool get showChinese => _showChinese;
+
+  bool get showChinese {
+    if (pageStyle == PageStyle.review) {
+      // 复习模式下,第一次不展示翻译
+      if (studyingWordRepeatCount == 1) {
+        return false;
+      }
+    }
+    return _showChinese;
+  }
+
   set showChinese(bool value) {
     if (_showChinese == value) return;
     _showChinese = value;
     notifyListeners();
   }
+
   /// 学习
   void repeatStudy() {
     _studyingWordRepeatCount += 1;
@@ -68,6 +82,8 @@ class StudyPageViewModel extends ChangeNotifier {
         _alreadyStudyWords.add(currentShowWord);
       }
       _switchNextWord();
+    } else if (_studyingWordRepeatCount == SINGLE_WORD_STUDY_MAX_COUNT) {
+      _showChinese = true;
     }
     notifyListeners();
   }

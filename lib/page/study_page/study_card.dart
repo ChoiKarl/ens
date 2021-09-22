@@ -3,8 +3,14 @@ import 'package:ens/page/study_page/study_page_view_model.dart';
 import 'package:ens/word_manager/word.dart';
 import 'package:ens/word_manager/word_manager.dart';
 import 'package:ens/yd/yd_translate.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 AudioPlayer _audioPlayer = AudioPlayer();
 
@@ -14,6 +20,8 @@ class StudyCard extends StatefulWidget {
 }
 
 class _StudyCardState extends State<StudyCard> {
+  YDTranslateResult? _translateResult;
+
   @override
   Widget build(BuildContext context) {
     var viewModel = Provider.of<StudyPageViewModel>(context, listen: false);
@@ -73,8 +81,33 @@ class _StudyCardState extends State<StudyCard> {
                         FittedBox(
                           fit: BoxFit.scaleDown,
                           child: GestureDetector(
+                            onTap: () {
+                              if (_translateResult?.webdict?.url != null) {
+                                Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                                  return Scaffold(
+                                    appBar: AppBar(title: Text(viewModel.currentShowWord.word)),
+                                    body: WebView(
+                                      initialUrl: _translateResult!.webdict!.url!,
+                                      javascriptMode: JavascriptMode.unrestricted,
+                                      gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>[
+                                        new Factory<OneSequenceGestureRecognizer>(
+                                              () => new EagerGestureRecognizer(),
+                                        ),
+                                      ].toSet(),
+                                    ),
+                                  );
+                                }));
+                              }
+                            },
                             onDoubleTap: () {
                               viewModel.showChinese = true;
+                            },
+                            onLongPress: () {
+                              Clipboard.setData(ClipboardData(
+                                text: viewModel.currentShowWord.word,
+                              )).then((value) {
+                                Fluttertoast.showToast(msg: '复制成功', gravity: ToastGravity.CENTER);
+                              });
                             },
                             child: Text(
                               word.word,
@@ -87,6 +120,7 @@ class _StudyCardState extends State<StudyCard> {
                         FutureBuilder<YDTranslateResult>(
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
+                              _translateResult = snapshot.data;
                               return GestureDetector(
                                 onTap: () {
                                   if (snapshot.data?.basic?.ukSpeech != null) {
